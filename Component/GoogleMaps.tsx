@@ -1,14 +1,9 @@
 import React, { FunctionComponent, useState, useEffect } from "react";
 import {
   StyleSheet,
-  Text,
-  View,
-  FlatList,
-  Alert,
-  TouchableOpacity,
-  ActivityIndicator,
   SafeAreaView,
 } from "react-native";
+import Config from '../Config/index';
 
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { Item } from "../Model/SearchData";
@@ -25,8 +20,8 @@ const GoogleMaps: FunctionComponent<GoogleMapsProps> = (
       <MapView
         style={styles.mapStyle}
         initialRegion={{
-          latitude: 12.971599,
-          longitude: 77.594566,
+          latitude: Config.LATITUDE,
+          longitude: Config.LONGITUDE,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
@@ -49,7 +44,7 @@ const GoogleMaps: FunctionComponent<GoogleMapsProps> = (
 
 const styles = StyleSheet.create({
   mapStyle: {
-    height: 500,
+    height: 400,
   },
 });
 

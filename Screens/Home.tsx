@@ -9,11 +9,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Animated,
+  Button,
 } from "react-native";
 import GoogleMaps from "../Component/GoogleMaps";
 import getSearchList from "../APILayer/SearchAPI";
 import { SearchData, Item } from "../Model/SearchData";
-import ListItem from '../Component/ListItem';
+import ListItem from "../Component/ListItem";
 
 interface HomeProps {}
 
@@ -21,45 +22,64 @@ const Home: FunctionComponent<HomeProps> = (props: HomeProps) => {
   const [query, setQuery] = useState("");
   const translation = useRef(new Animated.Value(0)).current;
   const [searchData, setSearchData] = useState<SearchData>();
+  const [loaderOn, setLoaderOn] = useState(false);
+  const [listOn, setListOn] = useState(false);
 
   useEffect(() => {
-    fetchSearchAPI();
+    // fetchSearchAPI();
   });
 
   const onPressShowList = () => {
-    Animated.timing(translation, {
-      toValue: -300,
-      duration: 400,
-      useNativeDriver: true,
-    }).start();
+    if (searchData) {
+      setListOn(!listOn);
+      Animated.timing(translation, {
+        toValue: listOn ? 0 : -300,
+        duration: 400,
+        useNativeDriver: true,
+      }).start();
+    }else{
+        Alert.alert('Search and expand')
+    }
   };
 
   const handleSearch = (text: String) => {
     const formattedQuery = text.toLowerCase();
-    // const filteredData = filter(fullData, user => {
-    //   return contains(user, formattedQuery);
-    // });
-    // setData(filteredData);
-    setQuery(text);
+    setQuery(formattedQuery);
   };
 
   const heightAnimation = {
     transform: [{ translateY: translation }],
   };
 
-  
   async function fetchSearchAPI() {
-    const data = await getSearchList.getSearchData();
-    const obj = JSON.parse(JSON.stringify(data)) as SearchData;
-    console.log(obj);
-    setSearchData(obj);
+    if (query.length == 0) {
+      Alert.alert("Search text empty");
+      return;
+    }
+
+    setLoaderOn(true);
+    try {
+      const data = await getSearchList.getSearchData(query);
+      const obj = JSON.parse(JSON.stringify(data)) as SearchData;
+      setSearchData(obj);
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Error on data load!");
+      setLoaderOn(false);
+    }
   }
 
-  const renderItem = ({ item}) => (
-      <ListItem data={item}/>
-);
+  const renderItem = ({ item }) => <ListItem data={item} />;
 
-const FlatListItemSeparator = () => {
+  const OnPressSearch = () => {
+    setLoaderOn(true);
+    {
+      async () => {
+        await fetchSearchAPI();
+      };
+    }
+  };
+  const FlatListItemSeparator = () => {
     return (
       <View
         style={{
@@ -69,35 +89,51 @@ const FlatListItemSeparator = () => {
         }}
       />
     );
-  }
-  
-
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.searchBarView}>
-        <TextInput
-          autoCapitalize="none"
-          autoCorrect={false}
-          clearButtonMode="always"
-          value={query}
-          onChangeText={(queryText) => handleSearch(queryText)}
-          placeholder="Search"
-          style={styles.textInputstyle}
-        />
+        <View style={styles.searchInputView}>
+          <TextInput
+            autoCapitalize="none"
+            autoCorrect={false}
+            value={query}
+            onChangeText={(queryText) => handleSearch(queryText)}
+            placeholder="Search"
+            style={styles.textInputstyle}
+          />
+        </View>
+        <View style={styles.searchButtonView}>
+          <TouchableOpacity
+            onPress={async () => {
+              await fetchSearchAPI();
+            }}
+          >
+            <Text style={styles.textStyle}>Search</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <GoogleMaps data={searchData?.businesses as Item[]}/>
+      <GoogleMaps data={searchData?.businesses as Item[]} />
       <Animated.View style={[styles.listViewContainer, heightAnimation]}>
+        <View style={styles.loaderview}></View>
         <TouchableOpacity
           style={styles.mapExpandButton}
           onPress={onPressShowList}
         >
-          <Text style={styles.textStyle}>Expand ᐯ</Text>
+          <Text style={styles.textStyle}>
+            {listOn ? "Reduce ᐯ" : "Expand ᐱ"}
+          </Text>
         </TouchableOpacity>
+        <View style={styles.loaderview}>
+          {loaderOn && searchData == undefined && (
+            <ActivityIndicator style={styles.loader} />
+          )}
+        </View>
         <FlatList
           data={searchData?.businesses}
           renderItem={renderItem}
-          ItemSeparatorComponent = { FlatListItemSeparator }
+          ItemSeparatorComponent={FlatListItemSeparator}
         />
       </Animated.View>
     </View>
@@ -112,9 +148,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 10,
     borderRadius: 20,
+    flexDirection: "row",
+    height: 54,
   },
   listViewContainer: {
-    backgroundColor: "green",
     top: 400,
     height: 720,
   },
@@ -131,8 +168,22 @@ const styles = StyleSheet.create({
     color: "#2683A9",
   },
   textInputstyle: {
-    backgroundColor: "#fff",
-    paddingHorizontal: 20,
+    height: 40,
+  },
+  loaderview: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loader: {
+    marginTop: 80,
+  },
+  searchButtonView: {
+    flex: 0.3,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  searchInputView: {
+    flex: 0.7,
   },
 });
 

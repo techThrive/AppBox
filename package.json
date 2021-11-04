@@ -10,6 +10,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@react-native-community/geolocation": "^2.0.2",
     "axios": "^0.24.0",
     "font-awesome": "^4.7.0",
     "react": "17.0.2",
