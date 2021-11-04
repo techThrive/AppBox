@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import FastImage from "react-native-fast-image";
 import { Item } from "../Model/SearchData";
+import { Rating } from "react-native-ratings";
 
 interface ListItemProps {
   data: Item;
@@ -37,7 +38,18 @@ const ListItem: FunctionComponent<ListItemProps> = (props: ListItemProps) => {
           {props.data.location.address}, {props.data.location.city}
         </Text>
         <Text style={styles.subTitle}> {props.data.phone}</Text>
-
+        <View style={styles.bottomView}>
+        <View style={styles.ratingView}>
+        <Rating
+          type="star"
+          ratingCount={5}
+          imageSize={20}
+        />
+        </View>
+        <View style={styles.ratingView}>
+            <Text style={styles.subTitle}> Total Review: {props.data.review_count}</Text>
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -46,8 +58,6 @@ const ListItem: FunctionComponent<ListItemProps> = (props: ListItemProps) => {
 const styles = StyleSheet.create({
   container: {
     height: 140,
-    borderBottomWidth: 3,
-    borderBottomColor: "gray",
     backgroundColor: "white",
     flex: 1,
     flexDirection: "row",
@@ -77,6 +87,16 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     color: "#34344c",
   },
+  bottomView:{
+    height:60,
+    flex:1,
+    flexDirection:'row',
+    justifyContent:'space-between'
+  },
+  ratingView:{
+      justifyContent:'flex-end',
+  },
+
 });
 
 export default ListItem;

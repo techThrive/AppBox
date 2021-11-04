@@ -59,6 +59,19 @@ const Home: FunctionComponent<HomeProps> = (props: HomeProps) => {
       <ListItem data={item}/>
 );
 
+const FlatListItemSeparator = () => {
+    return (
+      <View
+        style={{
+          height: 1,
+          width: "100%",
+          backgroundColor: "#DCE1E3",
+        }}
+      />
+    );
+  }
+  
+
 
   return (
     <View style={styles.container}>
@@ -73,7 +86,7 @@ const Home: FunctionComponent<HomeProps> = (props: HomeProps) => {
           style={styles.textInputstyle}
         />
       </View>
-      <GoogleMaps />
+      <GoogleMaps data={searchData?.businesses as Item[]}/>
       <Animated.View style={[styles.listViewContainer, heightAnimation]}>
         <TouchableOpacity
           style={styles.mapExpandButton}
@@ -84,6 +97,7 @@ const Home: FunctionComponent<HomeProps> = (props: HomeProps) => {
         <FlatList
           data={searchData?.businesses}
           renderItem={renderItem}
+          ItemSeparatorComponent = { FlatListItemSeparator }
         />
       </Animated.View>
     </View>

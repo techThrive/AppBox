@@ -11,8 +11,11 @@ import {
 } from "react-native";
 
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { Item } from "../Model/SearchData";
 
-interface GoogleMapsProps {}
+export interface GoogleMapsProps {
+  data: Item[];
+}
 
 const GoogleMaps: FunctionComponent<GoogleMapsProps> = (
   props: GoogleMapsProps
@@ -22,12 +25,24 @@ const GoogleMaps: FunctionComponent<GoogleMapsProps> = (
       <MapView
         style={styles.mapStyle}
         initialRegion={{
-          latitude: 37.78825,
-          longitude: -122.4324,
+          latitude: 12.971599,
+          longitude: 77.594566,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
-      />
+      >
+        {props.data != undefined && props.data.map((marker, index) => (
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: marker.coordinates.latitude,
+              longitude: marker.coordinates.longitude,
+            }}
+            title={marker.name as string}
+            description={marker.location.city as string}
+          />
+        ))}
+      </MapView>
     </SafeAreaView>
   );
 };
